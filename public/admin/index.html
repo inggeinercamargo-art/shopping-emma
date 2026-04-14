@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Shopping Emma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<!-- ══ SIDEBAR ═════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-s">Shopping</span>
+    <span class="logo-e">Emma</span>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-section="dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Resumen
+    </button>
+    <button class="nav-item" data-section="productos">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Productos
+    </button>
+    <button class="nav-item" data-section="nuevo-producto">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Nuevo producto
+    </button>
+    <button class="nav-item" data-section="pedidos">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Pedidos
+    </button>
+    <button class="nav-item" data-section="reportes">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reportes
+    </button>
+    <button class="nav-item" data-section="barrios">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Barrios
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-name" id="adminName"></div>
+    <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ════════════════════════════════════════════════ -->
+<main class="main-content">
+  <div class="topbar-admin">
+    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <h1 class="page-title" id="pageTitle">Resumen</h1>
+    <a href="/" target="_blank" class="btn-view-store">Ver tienda →</a>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section class="section active" id="section-dashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="grid-2col">
+      <div class="card">
+        <h3 class="card-title">Ventas últimos 7 días</h3>
+        <div class="chart-wrap" id="chartDia"></div>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Productos más vendidos</h3>
+        <div id="topProductos"></div>
+      </div>
+    </div>
+    <div class="card mt1">
+      <h3 class="card-title">Pedidos recientes</h3>
+      <div id="pedidosRecientes"></div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section class="section" id="section-productos">
+    <div class="section-header">
+      <input type="text" id="searchProductos" placeholder="Buscar producto..." class="search-sm" oninput="loadAdminProductos()">
+      <button class="btn-primary" onclick="showSection('nuevo-producto')">+ Nuevo producto</button>
+    </div>
+    <div class="table-wrap" id="tablaProductos"></div>
+  </section>
+
+  <!-- NUEVO / EDITAR PRODUCTO -->
+  <section class="section" id="section-nuevo-producto">
+    <div class="card">
+      <h3 class="card-title" id="formProdTitle">Nuevo producto</h3>
+      <form id="formProducto" onsubmit="submitProducto(event)">
+        <input type="hidden" id="prodId">
+
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p>Arrastra imágenes o haz clic para subir</p>
+          <small>Máximo 5 imágenes · JPG, PNG, WEBP · Máx 5MB c/u</small>
+        </div>
+        <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="previewImages(this)">
+        <div class="img-previews" id="imgPreviews"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del producto *</label>
+            <input type="text" id="pNombre" required placeholder="Vestido Flores Primavera">
+          </div>
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="pCategoria" required></select>
+          </div>
+          <div class="form-group">
+            <label>Precio (COP) *</label>
+            <input type="number" id="pPrecio" required min="0" placeholder="89900">
+          </div>
+          <div class="form-group">
+            <label>Tallas disponibles *</label>
+            <input type="text" id="pTallas" required placeholder="XS,S,M,L,XL">
+            <small>Separadas por coma</small>
+          </div>
+          <div class="form-group span2">
+            <label>Colores disponibles *</label>
+            <input type="text" id="pColores" required placeholder="Rojo,Negro,Blanco">
+            <small>Separados por coma</small>
+          </div>
+          <div class="form-group span2">
+            <label>Descripción</label>
+            <textarea id="pDesc" rows="3" placeholder="Descripción detallada del producto..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Disponible en tienda</label>
+            <div class="toggle-wrap">
+              <div class="toggle on" id="toggleDisponible" onclick="this.classList.toggle('on')">
+                <span></span>
+              </div>
+              <span class="toggle-label">Visible para clientes</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Marcar como destacado</label>
+            <div class="toggle-wrap">
+              <div class="toggle" id="toggleDestacado" onclick="this.classList.toggle('on')">
+                <span></span>
+              </div>
+              <span class="toggle-label">Aparece primero</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="showSection('productos')">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnSaveProd">Guardar producto</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- PEDIDOS -->
+  <section class="section" id="section-pedidos">
+    <div class="section-header">
+      <select id="filterEstado" onchange="loadPedidos()" class="search-sm">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en_camino">En camino</option>
+        <option value="entregado">Entregado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+      <input type="date" id="filterFecha" onchange="loadPedidos()" class="search-sm">
+      <button class="btn-secondary" onclick="document.getElementById('filterFecha').value='';loadPedidos()">Limpiar</button>
+    </div>
+    <div class="table-wrap" id="tablaPedidos"></div>
+  </section>
+
+  <!-- REPORTES -->
+  <section class="section" id="section-reportes">
+    <div class="tabs-bar">
+      <button class="tab active" onclick="showReporte('dia',this)">Por día</button>
+      <button class="tab" onclick="showReporte('mes',this)">Por mes</button>
+      <button class="tab" onclick="showReporte('barrios',this)">Por barrio</button>
+      <button class="tab" onclick="showReporte('productos',this)">Productos top</button>
+    </div>
+    <div id="reporteContent" class="card mt1"></div>
+  </section>
+
+  <!-- BARRIOS -->
+  <section class="section" id="section-barrios">
+    <div class="grid-2col">
+      <div class="card">
+        <h3 class="card-title">Agregar barrio</h3>
+        <div class="form-group">
+          <label>Nombre del barrio *</label>
+          <input type="text" id="barrioNombre" placeholder="Nombre del barrio">
+        </div>
+        <div class="form-group">
+          <label>Ciudad</label>
+          <select id="barrioCiudad">
+            <option value="Barranquilla">Barranquilla</option>
+            <option value="Soledad">Soledad</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="addBarrio()">Agregar barrio</button>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Barrios registrados</h3>
+        <div id="listaBarrios" style="max-height:400px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Modal detalle pedido -->
+<div class="modal-overlay" id="pedidoModal" onclick="closePedidoModal(event)">
+  <div class="modal-det">
+    <div class="modal-det-header">
+      <h3>Detalle del pedido</h3>
+      <button onclick="document.getElementById('pedidoModal').classList.remove('open')">×</button>
+    </div>
+    <div id="pedidoDetalle"></div>
+  </div>
+</div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

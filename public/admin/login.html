@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Shopping Emma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#FDF0F5 0%,#F6D5E4 50%,#fafafa 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.card{background:#fff;border-radius:20px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 12px 48px rgba(180,80,120,.15)}
+.logo{text-align:center;margin-bottom:2rem}
+.logo-s{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;letter-spacing:.12em;text-transform:uppercase;color:#999}
+.logo-e{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;color:#C94B7B;display:block;line-height:1.2}
+.subtitle{font-size:13px;color:#999;text-align:center;margin-top:4px;margin-bottom:2rem}
+.form-group{margin-bottom:1.25rem}
+.form-group label{font-size:12.5px;font-weight:500;color:#5a5a5a;display:block;margin-bottom:5px}
+.form-group input{width:100%;padding:11px 14px;border:1.5px solid #e8e0e4;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;transition:border-color .2s;color:#1a1a1a}
+.form-group input:focus{outline:none;border-color:#C94B7B}
+.btn{width:100%;padding:13px;background:#C94B7B;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;margin-top:.5rem;transition:background .2s;font-family:'DM Sans',sans-serif}
+.btn:hover{background:#8F3056}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.error{background:#FCE8F0;color:#8F3056;border-radius:8px;padding:10px 14px;font-size:13.5px;margin-top:.75rem;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <span class="logo-s">Shopping</span>
+    <span class="logo-e">Emma</span>
+  </div>
+  <p class="subtitle">Panel de administración</p>
+  <div class="form-group">
+    <label>Usuario</label>
+    <input type="text" id="username" placeholder="admin" autocomplete="username">
+  </div>
+  <div class="form-group">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+  </div>
+  <button class="btn" id="btnLogin" onclick="doLogin()">Entrar</button>
+  <div class="error" id="errorMsg"></div>
+</div>
+<script>
+async function doLogin() {
+  const btn = document.getElementById('btnLogin');
+  const err = document.getElementById('errorMsg');
+  btn.disabled = true; btn.textContent = 'Entrando...'; err.style.display='none';
+  try {
+    const res = await fetch('/admin/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) window.location.href = '/admin/dashboard';
+    else { err.textContent = data.error || 'Error'; err.style.display='block'; }
+  } catch(e) {
+    err.textContent = 'Error de conexión'; err.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='Entrar';
+}
+</script>
+</body>
+</html>

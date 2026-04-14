@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopping Emma — Moda Femenina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="logo">
+      <span class="logo-shopping">Shopping</span>
+      <span class="logo-emma">Emma</span>
+    </a>
+    <nav class="main-nav">
+      <a href="#" class="nav-link" data-cat="">Inicio</a>
+      <a href="#catalogo" class="nav-link" data-cat="Vestidos">Vestidos</a>
+      <a href="#catalogo" class="nav-link" data-cat="Blusas">Blusas</a>
+      <a href="#catalogo" class="nav-link" data-cat="Conjuntos">Conjuntos</a>
+      <a href="#catalogo" class="nav-link" data-cat="Faldas">Faldas</a>
+      <a href="#catalogo" class="nav-link" data-cat="Accesorios">Accesorios</a>
+    </nav>
+    <div class="topbar-right">
+      <button class="cart-btn" id="cartBtn" aria-label="Carrito">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ HERO ════════════════════════════════════════════════ -->
+<section class="hero" id="inicio">
+  <div class="hero-content">
+    <p class="hero-tag">Nueva colección 2025</p>
+    <h1 class="hero-title">Moda que te<br><em>hace brillar</em></h1>
+    <p class="hero-sub">Ropa femenina de calidad. Pago contraentrega en Barranquilla y Soledad.</p>
+    <a href="#catalogo" class="hero-cta">Ver colección</a>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-circle c1"></div>
+    <div class="hero-circle c2"></div>
+    <div class="hero-card-float">
+      <div class="float-tag">🚚 Contraentrega</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CATÁLOGO ════════════════════════════════════════════ -->
+<section class="catalog-section" id="catalogo">
+  <div class="catalog-inner">
+
+    <!-- Filtros -->
+    <aside class="filters-panel" id="filtersPanel">
+      <h3 class="filters-title">Filtrar</h3>
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Buscar..." class="search-input" oninput="debounceSearch()">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+      <div class="filter-group">
+        <p class="filter-group-label">Categoría</p>
+        <label class="filter-check active-check" data-cat="">
+          <input type="radio" name="cat" value="" checked> Todas
+        </label>
+        <div id="catFilters"></div>
+      </div>
+      <div class="filter-group">
+        <p class="filter-group-label">Precio</p>
+        <div class="price-range">
+          <input type="number" id="precioMin" placeholder="Mín" class="price-input">
+          <span>—</span>
+          <input type="number" id="precioMax" placeholder="Máx" class="price-input">
+        </div>
+        <button class="btn-filter-price" onclick="applyPriceFilter()">Aplicar</button>
+      </div>
+      <button class="btn-clear-filters" onclick="clearFilters()">Limpiar filtros</button>
+    </aside>
+
+    <!-- Productos -->
+    <div class="products-area">
+      <div class="products-header">
+        <span class="products-count" id="productsCount">Cargando...</span>
+        <select class="sort-select" id="sortSelect" onchange="loadProducts()">
+          <option value="nuevo">Más nuevos</option>
+          <option value="precio_asc">Precio: menor a mayor</option>
+          <option value="precio_desc">Precio: mayor a menor</option>
+          <option value="destacado">Destacados</option>
+        </select>
+      </div>
+      <div class="products-grid" id="productsGrid">
+        <div class="loading-grid">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MODAL PRODUCTO ══════════════════════════════════════ -->
+<div class="modal-backdrop" id="productModal" onclick="closeModal(event)">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModalBtn()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-inner">
+      <!-- Galería -->
+      <div class="modal-gallery">
+        <div class="main-img-wrap">
+          <img src="" alt="" id="mainImg" class="main-img">
+        </div>
+        <div class="thumbs-row" id="thumbsRow"></div>
+      </div>
+      <!-- Detalle -->
+      <div class="modal-detail">
+        <p class="modal-cat" id="modalCat"></p>
+        <h2 class="modal-name" id="modalName"></h2>
+        <p class="modal-price" id="modalPrice"></p>
+        <p class="modal-desc" id="modalDesc"></p>
+
+        <div class="detail-block">
+          <p class="detail-label">Color</p>
+          <div class="color-picker" id="colorPicker"></div>
+          <p class="selected-color-name" id="selectedColorName"></p>
+        </div>
+
+        <div class="detail-block">
+          <p class="detail-label">Talla</p>
+          <div class="size-picker" id="sizePicker"></div>
+        </div>
+
+        <div class="detail-block">
+          <p class="detail-label">Cantidad</p>
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-val" id="qtyVal">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-add-cart" id="btnAddCart" onclick="addToCart()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            Agregar al carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARRITO LATERAL ════════════════════════════════════ -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<aside class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mi carrito</h3>
+    <button onclick="toggleCart()" class="cart-close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</aside>
+
+<!-- ══ CHECKOUT ════════════════════════════════════════════ -->
+<div class="checkout-overlay" id="checkoutOverlay">
+  <div class="checkout-box">
+    <button class="checkout-back" onclick="closeCheckout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Volver al carrito
+    </button>
+
+    <div id="checkoutContent">
+      <h2 class="checkout-title">Confirmar pedido</h2>
+
+      <div class="contraentrega-info">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Pago 100% <strong>contraentrega</strong> — pagas cuando recibes
+      </div>
+
+      <div class="checkout-grid">
+        <!-- Resumen -->
+        <div class="checkout-summary" id="checkoutSummary"></div>
+
+        <!-- Formulario -->
+        <form class="checkout-form" id="checkoutForm" onsubmit="submitOrder(event)">
+          <h3 class="form-section-title">Datos de entrega</h3>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Nombre completo *</label>
+              <input type="text" id="cNombre" required placeholder="María García">
+            </div>
+            <div class="form-group">
+              <label>Celular *</label>
+              <input type="tel" id="cCelular" required placeholder="301 234 5678">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Dirección *</label>
+            <input type="text" id="cDireccion" required placeholder="Calle 45 # 23-10">
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Barrio *</label>
+              <select id="cBarrioSelect" onchange="toggleBarrioOtro()">
+                <option value="">Selecciona barrio...</option>
+                <optgroup label="Barranquilla" id="optBarranquilla"></optgroup>
+                <optgroup label="Soledad"      id="optSoledad"></optgroup>
+                <option value="otro">Otro barrio...</option>
+              </select>
+            </div>
+            <div class="form-group" id="barrioOtroGroup" style="display:none">
+              <label>Nombre del barrio *</label>
+              <input type="text" id="cBarrioOtro" placeholder="Escribe el barrio">
+            </div>
+            <div class="form-group" id="ciudadGroup">
+              <label>Ciudad</label>
+              <input type="text" id="cCiudad" value="Barranquilla" placeholder="Ciudad">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de entrega * <small>(máximo 3 días)</small></label>
+            <input type="date" id="cFecha" required>
+            <p class="input-hint">Entregas de lunes a sábado</p>
+          </div>
+
+          <div class="form-group">
+            <label>Notas adicionales</label>
+            <textarea id="cNotas" rows="2" placeholder="Punto de referencia, instrucciones especiales..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-confirm" id="btnConfirm">
+            Confirmar pedido
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Éxito -->
+    <div id="checkoutSuccess" style="display:none" class="success-screen">
+      <div class="success-icon">✅</div>
+      <h2>¡Pedido confirmado!</h2>
+      <p>Hemos registrado tu pedido. Te contactaremos al número proporcionado para coordinar la entrega.</p>
+      <p class="success-sub">Recuerda que el pago es <strong>contraentrega</strong>.</p>
+      <div class="success-num" id="successNum"></div>
+      <button class="btn-confirm" onclick="resetCheckout()">Seguir comprando</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="logo-shopping">Shopping</span> <span class="logo-emma">Emma</span>
+      <p>Moda femenina con estilo.<br>Barranquilla & Soledad, Colombia.</p>
+    </div>
+    <div class="footer-links">
+      <p>📞 Contáctanos por WhatsApp</p>
+      <p>🚚 Pago contraentrega</p>
+      <p>📦 Entrega en 1 a 3 días</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 Shopping Emma — Todos los derechos reservados</div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="/js/store.js"></script>
+</body>
+</html>
