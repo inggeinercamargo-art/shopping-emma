@@ -45,7 +45,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ Shopping Emma corriendo en http://localhost:${PORT}`);
   console.log(`   Panel admin: http://localhost:${PORT}/admin\n`);
 });
